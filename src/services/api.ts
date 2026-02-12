@@ -1,9 +1,12 @@
 import axios from 'axios';
 
 const getBaseUrl = () => {
-  // En producción (Netlify), usamos la variable de entorno
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) return envUrl;
+  // Intentamos obtener la variable de entorno inyectada por Vite
+  const envUrl = (import.meta as any).env.VITE_API_URL;
+
+  if (envUrl && envUrl.includes('onrender.com')) {
+    return envUrl;
+  }
 
   // En desarrollo local, detectamos la IP del PC automáticamente
   if (typeof window !== 'undefined') {
