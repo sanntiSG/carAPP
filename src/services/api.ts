@@ -1,12 +1,18 @@
 import axios from 'axios';
 
 const getBaseUrl = () => {
-  if ((import.meta as any).env.VITE_API_URL) {
-    return (import.meta as any).env.VITE_API_URL;
+  // En producción (Netlify), usamos la variable de entorno
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl;
+
+  // En desarrollo local, detectamos la IP del PC automáticamente
+  if (typeof window !== 'undefined') {
+    const { protocol, hostname } = window.location;
+    // Si estamos en localhost, devolvemos localhost, si no, la IP detectada
+    return `${protocol}//${hostname}:3001/api`;
   }
-  // Detectar la IP actual si no hay variable de entorno
-  const { protocol, hostname } = window.location;
-  return `${protocol}//${hostname}:3001/api`;
+
+  return 'http://localhost:3001/api';
 };
 
 const API_URL = getBaseUrl();
