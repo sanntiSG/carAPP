@@ -1,21 +1,22 @@
 import axios from 'axios';
 
 const getBaseUrl = () => {
-  // Intentamos obtener la variable de entorno inyectada por Vite
   const envUrl = (import.meta as any).env.VITE_API_URL;
+  const hostname = window.location.hostname;
 
-  if (envUrl && envUrl.includes('onrender.com')) {
-    return envUrl;
+  // 1. Si existe la variable de entorno, es la prioridad máxima (Producción)
+  if (envUrl) return envUrl;
+
+  // 2. Si estamos en Netlify pero NO llegó la variable, algo está mal en la config de Netlify
+  if (hostname.includes('netlify.app')) {
+    console.error('ERROR: VITE_API_URL no encontrada en producción.');
+    // Retornamos una cadena vacía para que Axios falle con un error más claro
+    return '/api-missing-config';
   }
 
-  // En desarrollo local, detectamos la IP del PC automáticamente
-  if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location;
-    // Si estamos en localhost, devolvemos localhost, si no, la IP detectada
-    return `${protocol}//${hostname}:3001/api`;
-  }
-
-  return 'http://localhost:3001/api';
+  // 3. Fallback para Desarrollo Local (PC y Móviles en la misma red)
+  const protocol = window.location.protocol;
+  return `${protocol}//${hostname}:3001/api`;
 };
 
 const API_URL = getBaseUrl();
