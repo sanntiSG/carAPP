@@ -1,11 +1,11 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { Setting } from '../models/Setting';
 import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
 
 // PUBLIC: Get dealership hours
-router.get('/hours', async (req, res) => {
+router.get('/hours', async (req: Request, res: Response) => {
     try {
         const hours = await Setting.findOne({ key: 'dealership_hours' });
         res.json(hours ? hours.value : {});
@@ -15,7 +15,7 @@ router.get('/hours', async (req, res) => {
 });
 
 // ADMIN: Update settings
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req: Request, res: Response) => {
     try {
         const { key, value } = req.body;
         const setting = await Setting.findOneAndUpdate(

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { Car } from '../models/Car';
 import { Reservation } from '../models/Reservation';
 import { authMiddleware } from '../middleware/auth';
@@ -7,7 +7,7 @@ import { notifyWaitlist } from '../services/waitlist.service';
 const router = express.Router();
 
 // PUBLIC: Get all cars (with filters)
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
     try {
         const { brand, year, minPrice, maxPrice, status } = req.query;
         let query: any = {};
@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 });
 
 // PUBLIC: Get car by ID & track view
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response) => {
     try {
         const car = await Car.findById(req.params.id);
         if (!car) return res.status(404).json({ error: 'Car not found' });
@@ -45,7 +45,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // ADMIN: Create car
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req: Request, res: Response) => {
     try {
         const car = new Car(req.body);
         await car.save();
@@ -56,7 +56,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // ADMIN: Update car
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
     try {
         const { status } = req.body;
         const oldCar = await Car.findById(req.params.id);
@@ -95,7 +95,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // ADMIN: Delete car
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
     try {
         await Car.findByIdAndDelete(req.params.id);
         res.json({ message: 'Car deleted' });

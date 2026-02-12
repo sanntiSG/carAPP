@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import crypto from 'crypto';
 import { Reservation } from '../models/Reservation';
 import { Car } from '../models/Car';
@@ -9,7 +9,7 @@ import { notifyWaitlist } from '../services/waitlist.service';
 const router = express.Router();
 
 // PUBLIC: Create reservation
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
     try {
         const { carId, userEmail, userName, date } = req.body;
 
@@ -102,7 +102,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUBLIC: Cancel reservation via code
-router.post('/cancel/:code', async (req, res) => {
+router.post('/cancel/:code', async (req: Request, res: Response) => {
     try {
         const reservation = await Reservation.findOne({ cancellationCode: req.params.code, status: 'CONFIRMED' });
         if (!reservation) return res.status(404).json({ error: 'Reservation not found or already cancelled' });
@@ -131,7 +131,7 @@ router.post('/cancel/:code', async (req, res) => {
 });
 
 // ADMIN: Get all reservations
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req: Request, res: Response) => {
     try {
         const reservations = await Reservation.find().populate('carId').sort({ date: 1 });
         res.json(reservations);
@@ -141,7 +141,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // ADMIN: Update reservation status (Visitado, etc)
-router.patch('/:id/status', authMiddleware, async (req, res) => {
+router.patch('/:id/status', authMiddleware, async (req: Request, res: Response) => {
     try {
         const { status, nextCarStatus } = req.body; // status: COMPLETED | CANCELLED, nextCarStatus: AVAILABLE | SOLD | NEGOTIATION
         const reservation = await Reservation.findById(req.params.id);

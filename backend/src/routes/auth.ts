@@ -1,11 +1,11 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret';
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });

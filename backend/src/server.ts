@@ -9,7 +9,7 @@ if (fs.existsSync(path.resolve(process.cwd(), '.env.local'))) {
   dotenv.config();
 }
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import cron from 'node-cron';
@@ -96,7 +96,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/settings', settingRoutes);
 
 // Health Check
-app.get('/health', (req, res) => res.json({ status: 'ok', env: process.env.NODE_ENV }));
+app.get('/health', (req: Request, res: Response) => res.json({ status: 'ok', env: process.env.NODE_ENV }));
 
 // --- CRON JOBS ---
 
