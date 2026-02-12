@@ -7,11 +7,10 @@ const getBaseUrl = () => {
   // 1. Si existe la variable de entorno, es la prioridad máxima (Producción)
   if (envUrl) return envUrl;
 
-  // 2. Si estamos en Netlify pero NO llegó la variable, algo está mal en la config de Netlify
+  // 2. Si estamos en Netlify (Producción), usamos el fallback hardcodeado de Render
   if (hostname.includes('netlify.app')) {
-    console.error('ERROR: VITE_API_URL no encontrada en producción.');
-    // Retornamos una cadena vacía para que Axios falle con un error más claro
-    return '/api-missing-config';
+    console.log('Usando URL de respaldo para Render...');
+    return 'https://carapp-ux2z.onrender.com/api';
   }
 
   // 3. Fallback para Desarrollo Local (PC y Móviles en la misma red)
