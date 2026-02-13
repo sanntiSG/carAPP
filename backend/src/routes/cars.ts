@@ -31,15 +31,18 @@ router.get('/', async (req: Request, res: Response) => {
 // PUBLIC: Get car by ID & track view
 router.get('/:id', async (req: Request, res: Response) => {
     try {
-        const car = await Car.findById(req.params.id);
-        if (!car) return res.status(404).json({ error: 'Car not found' });
+        // Find and increment views atomically
+        const car = await Car.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { views: 1 } },
+            { new: true }
+        );
 
-        // Increment views
-        car.views += 1;
-        await car.save();
+        if (!car) return res.status(404).json({ error: 'Car not found' });
 
         res.json(car);
     } catch (error) {
+        console.error('Error fetching car:', error);
         res.status(500).json({ error: 'Error fetching car' });
     }
 });
