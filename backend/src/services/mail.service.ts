@@ -31,7 +31,7 @@ export const sendEmail = async (options: EmailOptions) => {
             console.log('Sending email via Resend (Production)...');
             await resend.emails.send({
                 from,
-                to: options.to,
+                to: options.to.includes('<') ? options.to.split('<')[1].replace('>', '').trim() : options.to,
                 subject: options.subject,
                 html: options.html,
             });
