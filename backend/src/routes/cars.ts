@@ -64,7 +64,7 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
         const { status } = req.body;
         const oldCar = await Car.findById(req.params.id);
 
-        const car: any = await Car.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const car: any = await Car.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
 
         // If status changed, notify waitlist and handle reservations
         if (oldCar && status && oldCar.status !== status) {

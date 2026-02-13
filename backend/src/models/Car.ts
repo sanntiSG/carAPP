@@ -19,7 +19,7 @@ const CarSchema = new mongoose.Schema({
   lastVisitDate: Date,
   waitlist: [{
     userEmail: { type: String, required: true },
-    userName: { type: String, required: true },
+    userName: { type: String, required: false },
     joinedAt: { type: Date, default: Date.now }
   }],
   history: [{

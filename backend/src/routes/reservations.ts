@@ -13,6 +13,10 @@ router.post('/', async (req: Request, res: Response) => {
     try {
         const { carId, userEmail, userName, date } = req.body;
 
+        if (!carId || !userEmail || !userName || !date) {
+            return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+        }
+
         // Check if user already has an active reservation for THIS car
         const existing = await Reservation.findOne({ carId, userEmail, status: 'CONFIRMED' });
         if (existing) {
@@ -26,7 +30,11 @@ router.post('/', async (req: Request, res: Response) => {
                 // Check if already in waitlist
                 const alreadyInWaitlist = car.waitlist.some(w => w.userEmail === userEmail);
                 if (!alreadyInWaitlist) {
-                    car.waitlist.push({ userEmail, userName, joinedAt: new Date() } as any);
+                    car.waitlist.push({
+                        userEmail,
+                        userName: userName || 'Interesado',
+                        joinedAt: new Date()
+                    } as any);
                     await car.save();
 
                     // Notify user they joined the waitlist
@@ -95,9 +103,17 @@ router.post('/', async (req: Request, res: Response) => {
         });
 
         res.status(201).json(reservation);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to create reservation' });
+    } catch (error: any) {
+        console.error('Reservation creation error:', error);
+
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                error: 'Error de validación',
+                details: Object.values(error.errors).map((err: any) => err.message)
+            });
+        }
+
+        res.status(500).json({ error: 'Ha ocurrido un error al procesar la reserva.' });
     }
 });
 
