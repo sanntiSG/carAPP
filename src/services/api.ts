@@ -10,7 +10,7 @@ const getBaseUrl = () => {
   // 2. Si estamos en Netlify (Producción), usamos el fallback hardcodeado de Render
   if (hostname.includes('netlify.app')) {
     console.log('Usando URL de respaldo para Render...');
-    return 'https://carapp-ux2z.onrender.com/api';
+    return 'https://autoreserve-backend.onrender.com/api';
   }
 
   // 3. Fallback para Desarrollo Local (PC y Móviles en la misma red)
