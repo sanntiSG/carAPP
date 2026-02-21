@@ -1,4 +1,5 @@
 import { Car } from '../models/Car';
+import { Reservation } from '../models/Reservation';
 import { sendEmail } from './mail.service';
 
 export const notifyWaitlist = async (carId: string, status: string) => {
@@ -9,6 +10,10 @@ export const notifyWaitlist = async (carId: string, status: string) => {
 
     if (status === 'AVAILABLE') {
         const firstUser = waitlist[0];
+
+        // Remove the "WAITING" reservation for this user as they are being notified
+        await Reservation.findOneAndDelete({ carId, userEmail: firstUser.userEmail, status: 'WAITING' });
+
         sendEmail({
             to: `${firstUser.userName} <${firstUser.userEmail}>`,
             subject: `¡Buenas noticias! El ${car.brand} ${car.model} está disponible`,
@@ -41,7 +46,9 @@ export const notifyWaitlist = async (carId: string, status: string) => {
             });
         }
 
-        // Optionally clear waitlist since the car is gone
+        // Clear waitlist and remove associated WAITING reservations
+        await Reservation.deleteMany({ carId, status: 'WAITING' });
+
         car.waitlist = [];
         await car.save();
     }

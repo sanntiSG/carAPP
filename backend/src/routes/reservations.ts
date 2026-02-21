@@ -37,6 +37,17 @@ router.post('/', async (req: Request, res: Response) => {
                     } as any);
                     await car.save();
 
+                    // Create a "WAITING" reservation so it's visible in admin panel
+                    const waitlistReservation = new Reservation({
+                        carId,
+                        userEmail,
+                        userName,
+                        date: new Date(), // Just for record
+                        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60000), // Far in the future
+                        status: 'WAITING'
+                    });
+                    await waitlistReservation.save();
+
                     // Notify user they joined the waitlist
                     sendEmail({
                         to: `${userName} <${userEmail}>`,
@@ -203,6 +214,52 @@ router.patch('/:id/status', authMiddleware, async (req: Request, res: Response) 
     } catch (error) {
         console.error('Error updating reservation status:', error);
         res.status(500).json({ error: 'Failed to update status' });
+    }
+});
+
+// ADMIN: Export reservations to CSV
+router.get('/export', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        const reservations = await Reservation.find().populate('carId').sort({ createdAt: -1 });
+
+        let csv = 'Fecha,Cliente,Email,Auto,Precio,Estado\n';
+        reservations.forEach((r: any) => {
+            const date = new Date(r.date || r.createdAt).toLocaleString();
+            const carName = r.carId ? `${r.carId.brand} ${r.carId.model}` : 'N/A';
+            const price = r.carId ? r.carId.price : 'N/A';
+            csv += `"${date}","${r.userName}","${r.userEmail}","${carName}","${price}","${r.status}"\n`;
+        });
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=reservas.csv');
+        res.status(200).send(csv);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al exportar' });
+    }
+});
+
+// ADMIN: Clear all waitlist entries
+router.delete('/waitlist', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        // 1. Delete all WAITING reservations
+        await Reservation.deleteMany({ status: 'WAITING' });
+
+        // 2. Clear waitlist array from all cars
+        await Car.updateMany({}, { $set: { waitlist: [] } });
+
+        res.json({ message: 'Lista de espera vaciada por completo' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al vaciar lista de espera' });
+    }
+});
+
+// ADMIN: Clear finished/cancelled reservations
+router.delete('/all', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        await Reservation.deleteMany({ status: { $in: ['COMPLETED', 'CANCELLED'] } });
+        res.json({ message: 'Historial de reservas finalizadas vaciado' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al vaciar historial' });
     }
 });
 

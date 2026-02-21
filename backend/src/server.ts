@@ -23,6 +23,7 @@ import carRoutes from './routes/cars';
 import reservationRoutes from './routes/reservations';
 import authRoutes from './routes/auth';
 import settingRoutes from './routes/settings';
+import shortLinkRoutes from './routes/shortlinks';
 
 // Mail Service
 import { sendEmail } from './services/mail.service';
@@ -32,6 +33,11 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Ensure uploads directory exists
+if (!fs.existsSync('uploads')) {
+  fs.mkdirSync('uploads');
+}
 
 // Dynamic IP Detection
 function getLocalIp() {
@@ -94,6 +100,8 @@ app.use('/api/cars', carRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/settings', settingRoutes);
+app.use('/api/links', shortLinkRoutes);
+app.use('/s', shortLinkRoutes); // Alias para links cortos
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => res.json({ status: 'ok', env: process.env.NODE_ENV }));

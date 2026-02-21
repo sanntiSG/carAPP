@@ -7,6 +7,12 @@ const CarSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   imageUrl: { type: String, required: true },
   images: [{ type: String }], // Gallery
+  frontImageUrl: String,
+  leftImageUrl: String,
+  rightImageUrl: String,
+  upImageUrl: String,
+  backImageUrl: String,
+  interiorImageUrl: String,
   description: String,
   status: {
     type: String,

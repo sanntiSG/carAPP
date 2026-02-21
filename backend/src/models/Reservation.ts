@@ -7,11 +7,11 @@ const ReservationSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   status: {
     type: String,
-    enum: ['CONFIRMED', 'CANCELLED', 'COMPLETED', 'EXPIRED'],
+    enum: ['CONFIRMED', 'CANCELLED', 'COMPLETED', 'EXPIRED', 'WAITING'],
     default: 'CONFIRMED'
   },
   expiresAt: { type: Date, required: true }, // 30 min after 'date'
-  cancellationCode: { type: String, unique: true } // For unique cancellation link
+  cancellationCode: { type: String, unique: true, sparse: true } // sparse allows multiple nulls if not provided
 }, { timestamps: true });
 
 export const Reservation = mongoose.model('Reservation', ReservationSchema);
