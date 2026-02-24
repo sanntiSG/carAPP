@@ -19,9 +19,16 @@ const seedData = async () => {
         await Setting.deleteMany({});
 
         // Create Admin
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        if (!adminEmail || !adminPassword) {
+            throw new Error('ADMIN_EMAIL y ADMIN_PASSWORD deben estar definidos en el archivo .env');
+        }
+
         const admin = new User({
-            email: 'admin@dealer.com',
-            password: 'admin123', // In real app, hash this!
+            email: adminEmail,
+            password: adminPassword,
             name: 'Dealer Admin',
             role: 'ADMIN'
         });
