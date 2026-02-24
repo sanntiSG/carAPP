@@ -14,7 +14,7 @@ router.post('/shorten', async (req: Request, res: Response) => {
         if (existing) return res.json({ shortCode: existing.shortCode });
 
         // Generate unique code (random 4 chars)
-        const generateCode = () => Math.random().toString(36).substring(2, 6);
+        const generateCode = () => Math.random().toString(36).substring(2, 5); // Genera 3 caracteres (ej: "a7x")
         let code = generateCode();
 
         // Ensure uniqueness
