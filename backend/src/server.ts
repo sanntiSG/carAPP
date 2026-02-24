@@ -101,10 +101,13 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/links', shortLinkRoutes);
-app.use('/s', shortLinkRoutes); // Alias para links cortos
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => res.json({ status: 'ok', env: process.env.NODE_ENV }));
+
+// Alias para links cortos (directo en la raíz para máxima brevedad)
+// Dejar al final para no interferir con otras rutas
+app.use('/', shortLinkRoutes);
 
 // --- CRON JOBS ---
 
